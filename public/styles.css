@@ -1,0 +1,17 @@
+body {
+    width: 100%;
+    margin: 0;
+}
+
+form {
+    position: fixed;
+    bottom: 0;
+}
+
+form > input, button {
+    font-size: 24px;
+}
+
+button {
+    border-radius: 5px;
+}
