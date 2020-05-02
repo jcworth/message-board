@@ -11,16 +11,24 @@ const Message = mongoose.model('Message', {
     content: String
 })
 
-// Basic routing
+// Basic routing / file serving static site
 
 app.use(express.static('public'));
 
+// API endpoint
 app.get('/messages', (request, response) => {
-    response.sendStatus(200);
-    console.log('Page response')
+    Message.find({}, (error, messages) => {
+        response.send(messages)
+    })
+    // response.sendStatus(200);
+    console.log('API response')
 })
-
 app.post('/messages', (request, response) => {
+    const newMessage = new Message(request.body) ;
+    newMessage.save((error) => {
+        if (error) throw error;
+    })
+    response.sendStatus(200);
     console.log('Message POST');
 })
 
