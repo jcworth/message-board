@@ -3,12 +3,16 @@ const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+
 
 // Mongo Model
 
 const Message = mongoose.model('Message', {
-    name: String,
-    content: String
+    // name: String,
+    content: String,
+    date: String
 })
 
 // Basic routing / file serving static site
@@ -23,13 +27,13 @@ app.get('/messages', (request, response) => {
     // response.sendStatus(200);
     console.log('API response')
 })
-app.post('/messages', (request, response) => {
+app.post('/messages', (request, response) => {    
     const newMessage = new Message(request.body) ;
     newMessage.save((error) => {
         if (error) throw error;
     })
     response.sendStatus(200);
-    console.log('Message POST');
+    console.log(newMessage);
 })
 
 // MongoDB connection setup
