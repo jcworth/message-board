@@ -1,4 +1,5 @@
 const form = document.querySelector('form');
+const list = document.querySelector('#message-list')
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -18,5 +19,24 @@ function createMessage(message) {
         },
         body: JSON.stringify(message)
     })
-    console.log(message);
+    // console.log(message);
+};
+
+function retrieveMessage() {
+    fetch('http://localhost:3000/messages')
+        .then(response => response.json())
+        .then(messages => {
+            console.log(messages);
+            insertMessage(messages)
+        })
+};
+
+function insertMessage(messages) {
+    messages.forEach((message) => {
+        let newMessage = document.createElement('li');
+        newMessage.innerText = message.content
+        list.appendChild(newMessage); 
+    })
 }
+
+retrieveMessage()
