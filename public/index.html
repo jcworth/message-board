@@ -18,5 +18,49 @@
         </form>
     </div>
     <script src="client.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script>
+        const socket = io();
+        socket.on('message', insertMessage)
+
+        const form = document.querySelector('form');
+        const list = document.querySelector('#message-list')
+        // const socket = io();
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(form)
+            const content = formData.get('content')
+            createMessage({
+                content,
+                date: new Date()
+            })
+        })
+
+        function createMessage(message) {
+            fetch('http://localhost:3000/messages', {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify(message)
+            })
+        };
+
+        function retrieveMessage() {
+            fetch('http://localhost:3000/messages')
+            .then(response => response.json())
+            .then(messages => {
+                console.log(messages);
+                messages.forEach(message => insertMessage(message))
+            })
+        };
+
+        function insertMessage(message) {
+            let newMessage = document.createElement('li');
+            newMessage.innerText = message.content
+            list.append(newMessage); 
+        }
+    </script>
 </body>
 </html>

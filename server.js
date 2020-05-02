@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -24,7 +26,7 @@ app.get('/messages', (request, response) => {
     Message.find({}, (error, messages) => {
         response.send(messages)
     })
-    // response.sendStatus(200);
+    response.sendStatus(200);
     console.log('API response')
 })
 app.post('/messages', (request, response) => {    
@@ -33,7 +35,12 @@ app.post('/messages', (request, response) => {
         if (error) throw error;
     })
     response.sendStatus(200);
-    console.log(newMessage);
+    io.emit('message', newMessage);
+})
+
+io.on('connection', (socket) => {
+    console.log('User connected');
+    socket.on('disconnect', () => console.log('User disconnected'));
 })
 
 // MongoDB connection setup
@@ -50,6 +57,10 @@ db.on('error', (err) => {
 
 // Server connection
 
-app.listen(3000, () => {
-    console.log('Connected on port 3000')
+http.listen(3000, () => {
+    console.log('Connected on port 3000');
 })
+// app.listen(3000, () => {
+//     console.log('Connected on port 3000')
+// })
+

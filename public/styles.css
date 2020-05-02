@@ -16,6 +16,16 @@ button {
     border-radius: 5px;
 }
 
+ul {
+    height: 80vh;
+    overflow: scroll;
+    padding: 0;
+}
 li {
     list-style: none;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
 }
