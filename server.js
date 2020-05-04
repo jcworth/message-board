@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 // Mongo Model
 
 const Message = mongoose.model('Message', {
-    // name: String,
+    username: String,
     content: String,
     date: String
 })
@@ -38,9 +38,19 @@ app.post('/messages', (request, response) => {
     io.emit('message', newMessage);
 })
 
+// Websocket connection indicator in console. Socket events run within connection function.
 io.on('connection', (socket) => {
     console.log('User connected');
+    socket.on('typing', (data) => {
+        console.log(`${data.username} is typing`)
+        socket.broadcast.emit('notifyTyping', data)
+    })
     socket.on('disconnect', () => console.log('User disconnected'));
+})
+
+io.on('typing', (data) => {
+    console.log(data)
+    // io.emit('notifyTyping', data)
 })
 
 // MongoDB connection setup

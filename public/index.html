@@ -9,33 +9,54 @@
 <body>
     <div class="container">
         <h1>Message Board</h1>
-        <ul id="message-list">
-        </ul>
-        <form action="/" method="POST">
-            <label for="content"></label>
-            <input type="text" name="content" id="content">
-            <button>Submit</button>
-        </form>
+        <div class="message-box">
+            <ul id="message-list">
+            </ul>
+            <form action="/" method="POST">
+                <label for="content"></label>
+                <input type="text" name="content" id="content">
+                <button>Submit</button
+            </form>
+        </div>
     </div>
     <script src="client.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script>
+        const username = prompt('enter a username')
+        const form = document.querySelector('form');
+        const list = document.querySelector('#message-list')
+        const input = document.querySelector('#content');
+
+        // io() is global object provided by the CDN. Socket listens for incoming 'emits'
+        // from the server and performs the assigned function
         const socket = io();
         socket.on('message', insertMessage)
 
-        const form = document.querySelector('form');
-        const list = document.querySelector('#message-list')
-        // const socket = io();
+        // username.addEventListener('submit', () => {
+        //     list.append(`${username} has joined the chat`)
+        // });
+
+        input.addEventListener('keydown', (event) => {
+            socket.emit('typing', {username: username, typing: true});
+        });
+
+        socket.on('notifyTyping', (data) => {
+            let typingEle = document.createElement('li');
+            typingEle.innerText = `${data.username} is typing`
+            list.appendChild(typingEle)
+            console.log(data)
+        })
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const formData = new FormData(form)
             const content = formData.get('content')
             createMessage({
+                username,
                 content,
                 date: new Date()
             })
-        })
+        });
 
         function createMessage(message) {
             fetch('http://localhost:3000/messages', {
@@ -58,9 +79,9 @@
 
         function insertMessage(message) {
             let newMessage = document.createElement('li');
-            newMessage.innerText = message.content
+            newMessage.innerText = `${message.username}: ${message.content}` 
             list.append(newMessage); 
-        }
+        };
     </script>
 </body>
 </html>
