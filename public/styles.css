@@ -27,13 +27,22 @@ button {
 
 }
 
-li:nth-child(even) {
-    background: lightgrey;
-}
-
 li {
     list-style: none;
     padding: 8px;
+    /* background: lightblue; */
+    /* color: white; */
+}
+
+li > p {
+    background: #0077be;
+    color: white;
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.typing-gif {
+    height: 2rem;
 }
 
 .container {
@@ -45,5 +54,8 @@ li {
     padding: 10px;
     border: 1px solid black;
     border-radius: 50px;
+}
 
+.other-user {
+    background: red;
 }

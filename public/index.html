@@ -11,6 +11,7 @@
         <h1>Message Board</h1>
         <div class="message-box">
             <ul id="message-list">
+                <li id="typing-notification"></li>
             </ul>
             <form action="/" method="POST">
                 <label for="content"></label>
@@ -26,27 +27,39 @@
         const form = document.querySelector('form');
         const list = document.querySelector('#message-list')
         const input = document.querySelector('#content');
+        const typing = document.getElementById('typing-notification')
 
         // io() is global object provided by the CDN. Socket listens for incoming 'emits'
         // from the server and performs the assigned function
         const socket = io();
         socket.on('message', insertMessage)
 
-        // username.addEventListener('submit', () => {
-        //     list.append(`${username} has joined the chat`)
-        // });
-
+        // Websocket typing notifications
+        let timeout;
         input.addEventListener('keydown', (event) => {
+            // console.log(event)
+            if (event.keycode == 13) {
+                clearTimeout(timeout)
+                timeout = setTimeout(ceaseTyping, 1500);
+            }
             socket.emit('typing', {username: username, typing: true});
-        });
+            clearTimeout(timeout)
+            timeout = setTimeout(ceaseTyping, 1500);
+        });        
+        
+        function ceaseTyping() {
+            socket.emit('typing', {username: username, typing: false})
+        }
 
         socket.on('notifyTyping', (data) => {
-            let typingEle = document.createElement('li');
-            typingEle.innerText = `${data.username} is typing`
-            list.appendChild(typingEle)
-            console.log(data)
-        })
+            if (data.typing == true) {
+                typing.innerHTML = `<img class="typing-gif" src="typing.gif">`;
+            } else {
+                typing.innerHTML = "";
+            };
+        });
 
+        // Send a message to the server
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const formData = new FormData(form)
@@ -68,6 +81,7 @@
             })
         };
 
+        // Fetch messages from the server and display them
         function retrieveMessage() {
             fetch('http://localhost:3000/messages')
             .then(response => response.json())
@@ -79,8 +93,11 @@
 
         function insertMessage(message) {
             let newMessage = document.createElement('li');
-            newMessage.innerText = `${message.username}: ${message.content}` 
-            list.append(newMessage); 
+            newMessage.innerHTML = `<p>${message.username}: ${message.content}</p>` 
+            if (message.username !== username) {
+                newMessage.firstElementChild.classList.add('other-user')                
+            }
+            list.insertBefore(newMessage, typing);
         };
     </script>
 </body>

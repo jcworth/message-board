@@ -50,7 +50,7 @@ io.on('connection', (socket) => {
 
 io.on('typing', (data) => {
     console.log(data)
-    // io.emit('notifyTyping', data)
+    io.emit('notifyTyping', data)
 })
 
 // MongoDB connection setup
